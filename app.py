@@ -6,7 +6,7 @@ from streamlit_folium import st_folium
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv("Completed_Sentiments_CLEAN.csv")
+    df = pd.read_csv("data.csv")
     return df
 
 def main():
