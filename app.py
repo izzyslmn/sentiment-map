@@ -12,7 +12,7 @@ def load_data():
 def main():
     df = load_data()
 
-    st.title("📍 Interactive Map of Sentiment by Location")
+    st.title("A Sentimental City: Mapping How Literature Felt About Edinburgh")
     st.sidebar.header("Filter Options")
 
     # Year filtering
