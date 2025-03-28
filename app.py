@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import streamlit as st
 import pandas as pd
 import folium
@@ -8,20 +7,9 @@ from streamlit_folium import st_folium
 def load_data():
     df = pd.read_csv("Completed_Sentiments_CLEAN.csv")
 
-    
-def combine_genders(g1, g2):
-    g1 = str(g1).strip().lower().replace("u", "unknown").replace("0", "")
-    g2 = str(g2).strip().lower().replace("u", "unknown").replace("0", "")
-    genders = sorted(filter(None, [g1, g2]))
-    if not genders:
-        return "Unknown"
-    if len(genders) == 1:
-        return genders[0].capitalize()
-    combo = " + ".join(g.capitalize() if g != "unknown" else "Unknown" for g in genders)
-    return combo
-
-        g1 = str(g1).strip().lower()
-        g2 = str(g2).strip().lower()
+    def combine_genders(g1, g2):
+        g1 = str(g1).strip().lower().replace("u", "unknown").replace("0", "")
+        g2 = str(g2).strip().lower().replace("u", "unknown").replace("0", "")
         genders = sorted(filter(None, [g1, g2]))
         if not genders:
             return "Unknown"
@@ -65,23 +53,19 @@ def main():
                 year_range = st.sidebar.slider("Publication Year Range", min_year, max_year, (min_year, max_year))
                 df = df[(df["pubyear"] >= year_range[0]) & (df["pubyear"] <= year_range[1])]
 
-    # Genre filters
     genre_options = pd.unique(df[["Genre 1", "Genre 2"]].values.ravel("K")) if "Genre 1" in df.columns else []
     selected_genres = st.sidebar.multiselect("Select Genre(s)", [g for g in genre_options if pd.notna(g)])
 
-    # Fiction / Non-fiction filter
     if "genre_type" in df.columns:
         selected_type = st.sidebar.selectbox("Fiction or Non-Fiction", ["All", "Fiction", "Non-Fiction"])
         if selected_type != "All":
             df = df[df["genre_type"] == selected_type]
 
-    # Gender filter
     gender_options = sorted(df["author_gender_combo"].dropna().unique())
     selected_gender = st.sidebar.selectbox("Author Gender Combination", ["All"] + gender_options)
     if selected_gender != "All":
         df = df[df["author_gender_combo"] == selected_gender]
 
-    # Sentiment filter
     sentiment_options = df["final_sentiment"].unique().tolist() if "final_sentiment" in df.columns else []
     selected_sentiments = st.sidebar.multiselect("Select Sentiment(s)", sentiment_options, default=sentiment_options)
     if "final_sentiment" in df.columns:
@@ -90,7 +74,6 @@ def main():
     if selected_genres:
         df = df[df["Genre 1"].isin(selected_genres) | df["Genre 2"].isin(selected_genres)]
 
-    # Map creation
     m = folium.Map(location=[55.9533, -3.1883], zoom_start=12)
 
     for _, row in df.iterrows():
