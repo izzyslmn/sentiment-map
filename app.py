@@ -9,7 +9,6 @@ def load_data():
     df = pd.read_csv("Completed_Sentiments_CLEAN.csv")
 
     
-
 def combine_genders(g1, g2):
     g1 = str(g1).strip().lower().replace("u", "unknown").replace("0", "")
     g2 = str(g2).strip().lower().replace("u", "unknown").replace("0", "")
