@@ -8,7 +8,18 @@ from streamlit_folium import st_folium
 def load_data():
     df = pd.read_csv("Completed_Sentiments_CLEAN.csv")
 
-    def combine_genders(g1, g2):
+    
+def combine_genders(g1, g2):
+    g1 = str(g1).strip().lower().replace("u", "unknown").replace("0", "")
+    g2 = str(g2).strip().lower().replace("u", "unknown").replace("0", "")
+    genders = sorted(filter(None, [g1, g2]))
+    if not genders:
+        return "Unknown"
+    if len(genders) == 1:
+        return genders[0].capitalize()
+    combo = " + ".join(g.capitalize() if g != "unknown" else "Unknown" for g in genders)
+    return combo
+
         g1 = str(g1).strip().lower()
         g2 = str(g2).strip().lower()
         genders = sorted(filter(None, [g1, g2]))
