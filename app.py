@@ -96,7 +96,7 @@ def main():
     for _, row in df.iterrows():
         if pd.notnull(row.get("lat")) and pd.notnull(row.get("lon")):
             popup_html = (
-                f"<b>Sentence:</b> {row.get('text', '')}<br>"
+                f"<b>Sentence:</b> {row.get('text_sentence', '')}<br>"
                 f"<b>Book:</b> {row.get('title', 'Unknown')}<br>"
                 f"<b>Author:</b> {row.get('forename', '')} {row.get('surname', '')}<br>"
                 f"<b>Sentiment:</b> {row.get('final_sentiment', 'N/A')}<br>"
