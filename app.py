@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import st_folium
+from folium.plugins import HeatMap
 
 @st.cache_data
 def load_data():
@@ -48,6 +49,10 @@ def main():
             else:
                 year_range = st.sidebar.slider("Publication Year Range", min_year, max_year, (min_year, max_year))
                 df = df[(df["pubyear"] >= year_range[0]) & (df["pubyear"] <= year_range[1])]
+                if df.empty:
+                    st.info("Data Gaps: Some years have little or no literary data shown. This may be due to publication trends, curatorial decisions, availability of digital texts, our sentiment analysis stage, or other reasons that we invite you to consider. This absence is part of the data story too.")
+
+    st.sidebar.markdown("_Note: this filter is based on the year of **publication**, not the year in which a story is set._")
 
     genre_options = pd.unique(df[["Genre 1", "Genre 2"]].values.ravel("K")) if "Genre 1" in df.columns else []
     selected_genres = st.sidebar.multiselect("Select Genre(s)", [g for g in genre_options if pd.notna(g)])
@@ -70,30 +75,46 @@ def main():
     if selected_genres:
         df = df[df["Genre 1"].isin(selected_genres) | df["Genre 2"].isin(selected_genres)]
 
+    show_heatmap = st.sidebar.checkbox("Show Heatmap Instead of Markers")
+
     m = folium.Map(location=[55.9533, -3.1883], zoom_start=12)
 
-    for _, row in df.iterrows():
-        if pd.notnull(row.get("lat")) and pd.notnull(row.get("lon")):
-            popup_html = (
-                f"<b>Sentence:</b> {row.get('text_sentence', '')}<br>"
-                f"<b>Book:</b> {row.get('title', 'Unknown')}<br>"
-                f"<b>Author:</b> {row.get('forename', '')} {row.get('surname', '')}<br>"
-                f"<b>Sentiment:</b> {row.get('final_sentiment', 'N/A')}<br>"
-                f"<b>Year:</b> {row.get('pubyear', 'N/A')}"
-            )
-            color = {"Positive": "green", "Neutral": "purple", "Negative": "red"}.get(row.get("final_sentiment", ""), "gray")
-            folium.CircleMarker(
-                location=(row["lat"], row["lon"]),
-                radius=5,
-                color=color,
-                fill=True,
-                fill_opacity=0.7,
-                popup=folium.Popup(popup_html, max_width=300)
-            ).add_to(m)
+    if show_heatmap:
+        heat_data = df[["lat", "lon", "final_score"]].dropna().values.tolist()
+        HeatMap(heat_data, radius=10, blur=15).add_to(m)
+    else:
+        for _, row in df.iterrows():
+            if pd.notnull(row.get("lat")) and pd.notnull(row.get("lon")):
+                popup_html = (
+                    f"<b>Sentence:</b> {row.get('text_sentence', '')}<br>"
+                    f"<b>Book:</b> {row.get('title', 'Unknown')}<br>"
+                    f"<b>Author:</b> {row.get('forename', '')} {row.get('surname', '')}<br>"
+                    f"<b>Sentiment:</b> {row.get('final_sentiment', 'N/A')}<br>"
+                    f"<b>Year:</b> {row.get('pubyear', 'N/A')}"
+                )
+                color = {"Positive": "green", "Neutral": "purple", "Negative": "red"}.get(row.get("final_sentiment", ""), "gray")
+                folium.CircleMarker(
+                    location=(row["lat"], row["lon"]),
+                    radius=5,
+                    color=color,
+                    fill=True,
+                    fill_opacity=0.7,
+                    popup=folium.Popup(popup_html, max_width=300)
+                ).add_to(m)
 
     st_folium(m, width=700, height=500)
-    st.markdown("---")
-    st.markdown("Developed for exploring sentiment and emotion in Edinburgh's literary geography.")
+
+    with st.expander("ℹ️ About This Map"):
+        st.markdown("**How Sentiment Was Measured**  
+"
+                    "Our sentiment analysis identifies whether sentences expressed a **positive**, **negative**, or **neutral** feeling **about the mentioned place**, not just the overall tone.")
+
+        st.markdown("**About the Data**  
+"
+                    "This map uses a subset of the LitLong Edinburgh dataset. All literary locations were tagged and categorised by curators. "
+                    "This means genre, inclusion, and classification decisions were made by individuals. "
+                    "Further filtering, specific to this project, was applied to analyse sentiment. "
+                    "This is therefore not a complete map of the original dataset. Users are encouraged to reflect on what may be missing and why.")
 
 if __name__ == "__main__":
     main()
