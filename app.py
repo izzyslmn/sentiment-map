@@ -29,6 +29,11 @@ def load_data():
             return "Unknown"
         df["genre_type"] = df["Genre 1"].apply(infer_genre_type)
 
+    # Add fallback sentiment weights if 'final_score' is not in the CSV
+    if "final_score" not in df.columns and "final_sentiment" in df.columns:
+        sentiment_weights = {"Positive": 1.0, "Neutral": 0.5, "Negative": 0.0}
+        df["final_score"] = df["final_sentiment"].map(sentiment_weights)
+
     return df
 
 def main():
