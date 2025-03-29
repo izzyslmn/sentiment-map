@@ -8,15 +8,11 @@ def load_data():
     df = pd.read_csv("Completed_Sentiments_CLEAN.csv")
 
     def combine_genders(g1, g2):
-        g1 = str(g1).strip().lower().replace("u", "unknown").replace("0", "")
-        g2 = str(g2).strip().lower().replace("u", "unknown").replace("0", "")
-        genders = sorted(filter(None, [g1, g2]))
-        if not genders:
-            return "Unknown"
-        if len(genders) == 1:
-            return genders[0].capitalize()
-        combo = " + ".join(g.capitalize() if g != "unknown" else "Unknown" for g in genders)
-        return combo
+        g_map = {"m": "Male", "f": "Female", "u": "Unknown", "0": "", "nan": "", "": "", None: ""}
+        g1_clean = g_map.get(str(g1).strip().lower(), "Unknown")
+        g2_clean = g_map.get(str(g2).strip().lower(), "Unknown")
+        genders = sorted(set(filter(None, [g1_clean, g2_clean])))
+        return " + ".join(genders) if genders else "Unknown"
 
     df["author_gender_combo"] = df.apply(lambda row: combine_genders(row.get("gender", ""), row.get("2nd Author - Gen", "")), axis=1)
 
@@ -85,7 +81,7 @@ def main():
                 f"<b>Sentiment:</b> {row.get('final_sentiment', 'N/A')}<br>"
                 f"<b>Year:</b> {row.get('pubyear', 'N/A')}"
             )
-            color = {"Positive": "green", "Neutral": "lightgray", "Negative": "red"}.get(row.get("final_sentiment", ""), "gray")
+            color = {"Positive": "green", "Neutral": "purple", "Negative": "red"}.get(row.get("final_sentiment", ""), "gray")
             folium.CircleMarker(
                 location=(row["lat"], row["lon"]),
                 radius=5,
