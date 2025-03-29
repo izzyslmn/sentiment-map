@@ -105,16 +105,14 @@ def main():
     st_folium(m, width=700, height=500)
 
     with st.expander("ℹ️ About This Map"):
-        st.markdown("**How Sentiment Was Measured**  
-"
-                    "Our sentiment analysis identifies whether sentences expressed a **positive**, **negative**, or **neutral** feeling **about the mentioned place**, not just the overall tone.")
+        st.markdown("""**How Sentiment Was Measured**  
+Our sentiment analysis identifies whether sentences expressed a **positive**, **negative**, or **neutral** feeling **about the mentioned place**, not just the overall tone.""")
 
-        st.markdown("**About the Data**  
-"
-                    "This map uses a subset of the LitLong Edinburgh dataset. All literary locations were tagged and categorised by curators. "
-                    "This means genre, inclusion, and classification decisions were made by individuals. "
-                    "Further filtering, specific to this project, was applied to analyse sentiment. "
-                    "This is therefore not a complete map of the original dataset. Users are encouraged to reflect on what may be missing and why.")
+        st.markdown("""**About the Data**  
+This map uses a subset of the LitLong Edinburgh dataset. All literary locations were tagged and categorised by curators.  
+This means genre, inclusion, and classification decisions were made by individuals.  
+Further filtering, specific to this project, was applied to analyse sentiment.  
+This is therefore not a complete map of the original dataset. Users are encouraged to reflect on what may be missing and why.""")
 
 if __name__ == "__main__":
     main()
