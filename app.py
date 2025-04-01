@@ -62,7 +62,7 @@ def main():
     st.sidebar.markdown("_Note: this filter is based on the year of **publication**, not the year in which a story is set._")
 
     genre_options = pd.unique(df[["Genre 1", "Genre 2"]].values.ravel("K")) if "Genre 1" in df.columns else []
-selected_genres = st.sidebar.multiselect("Select Genre(s)", [g for g in genre_options if pd.notna(g)])
+    selected_genres = st.sidebar.multiselect("Select Genre(s)", [g for g in genre_options if pd.notna(g)])
 
     if "genre_type" in df.columns:
         selected_type = st.sidebar.selectbox("Fiction or Non-Fiction", ["All", "Fiction", "Non-Fiction"])
