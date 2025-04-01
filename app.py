@@ -7,6 +7,8 @@ from folium.plugins import HeatMap
 @st.cache_data
 def load_data():
     df = pd.read_csv("Completed_Sentiments_CLEAN.csv")
+    df["Genre 1"] = df["Genre 1"].replace("0", "Unknown")
+    df["Genre 2"] = df["Genre 2"].replace("0", "Unknown")
 
     def combine_genders(g1, g2):
         g_map = {"m": "Male", "f": "Female", "u": "Unknown", "0": "", "nan": "", "": "", None: ""}
@@ -59,10 +61,8 @@ def main():
 
     st.sidebar.markdown("_Note: this filter is based on the year of **publication**, not the year in which a story is set._")
 
-    df["Genre 1"] = df["Genre 1"].replace("0", "Unknown")
-    df["Genre 2"] = df["Genre 2"].replace("0", "Unknown")
-genre_options = pd.unique(df[["Genre 1", "Genre 2"]].values.ravel("K")) if "Genre 1" in df.columns else []
-    selected_genres = st.sidebar.multiselect("Select Genre(s)", [g for g in genre_options if pd.notna(g)])
+    genre_options = pd.unique(df[["Genre 1", "Genre 2"]].values.ravel("K")) if "Genre 1" in df.columns else []
+selected_genres = st.sidebar.multiselect("Select Genre(s)", [g for g in genre_options if pd.notna(g)])
 
     if "genre_type" in df.columns:
         selected_type = st.sidebar.selectbox("Fiction or Non-Fiction", ["All", "Fiction", "Non-Fiction"])
